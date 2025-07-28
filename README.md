@@ -99,3 +99,8 @@ To run the notebook locally:
 git clone https://github.com/carine-ahishakiye/ML_Summative.git
 cd ML_Summative
 
+Demo: https://youtu.be/2iOJuLZKP5A?feature=shared
+
+
+Github repository: https://github.com/carine-ahishakiye/ML_Summative.git
+

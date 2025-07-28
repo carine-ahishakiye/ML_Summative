@@ -1,35 +1,42 @@
-# main.py
-
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import joblib
-import numpy as np
-
-# Load model and encoders
-model = joblib.load("salary_model.joblib")
-le_employment = joblib.load("employment_encoder.joblib")
-le_experience = joblib.load("experience_encoder.joblib")
 
 app = FastAPI()
 
-# Request body structure
+# ✅ CORS setup for allowing requests from frontend (adjust origin if needed)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can replace "*" with your frontend URL for better security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ✅ Request schema
 class SalaryRequest(BaseModel):
     employment_type: str
     experience_level: str
 
-# Root endpoint
+# ✅ Response schema (optional but clean)
+class SalaryResponse(BaseModel):
+    predicted_salary: int
+
 @app.get("/")
 def read_root():
-    return {"message": "Salary Prediction API is live!"}
+    return {"message": "FastAPI backend is running"}
 
-# Prediction endpoint
-@app.post("/predict")
+@app.post("/predict", response_model=SalaryResponse)
 def predict_salary(data: SalaryRequest):
-    try:
-        emp_encoded = le_employment.transform([data.employment_type])
-        exp_encoded = le_experience.transform([data.experience_level])
-        features = np.array([[emp_encoded[0], exp_encoded[0]]])
-        prediction = model.predict(features)
-        return {"predicted_salary_usd": round(prediction[0], 2)}
-    except Exception as e:
-        return {"error": str(e)}
+    # Dummy logic — replace with ML model later if needed
+    base_salary = 50000
+    if data.experience_level.upper() == "EX":
+        base_salary = 120000
+    elif data.experience_level.upper() == "SE":
+        base_salary = 90000
+    elif data.experience_level.upper() == "MI":
+        base_salary = 70000
+    elif data.experience_level.upper() == "EN":
+        base_salary = 50000
+
+    return {"predicted_salary": base_salary}
